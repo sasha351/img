@@ -7,7 +7,7 @@ import io
 import os
 import sys
 from functools import lru_cache
-from typing import Callable, Iterable
+from typing import Callable
 
 from PIL import Image
 from tqdm import tqdm
@@ -85,7 +85,7 @@ def convert_image(
     resolved_output_format = infer_output_format(output_path, output_format)
 
     progress_steps = 2 + int(remove_background)
-    progress: Iterable[int]
+    progress: tqdm | None
     if show_progress:
         progress = tqdm(total=progress_steps, desc="Processing image", unit="step")
     else:

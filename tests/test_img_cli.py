@@ -42,6 +42,7 @@ class ImgCliTests(unittest.TestCase):
         with redirect_stdout(stream):
             exit_code = main(["--list-formats"])
         self.assertEqual(exit_code, 0)
+        self.assertIn("PNG", stream.getvalue())
 
 
 if __name__ == "__main__":
