@@ -12,6 +12,10 @@ from typing import Callable
 from PIL import Image
 from tqdm import tqdm
 
+DEFAULT_REMBG_MODEL = "isnet-general-use"
+DEFAULT_JPEG_QUALITY = 95
+DEFAULT_PNG_COMPRESS_LEVEL = 6
+
 
 def _normalize_format(value: str | None) -> str | None:
     if value is None:
@@ -50,16 +54,16 @@ def detect_input_format(input_path: str) -> str | None:
 
 
 @lru_cache(maxsize=1)
-def _get_rembg_session():
+def _get_rembg_session(model_name: str = DEFAULT_REMBG_MODEL):
     from rembg import new_session
 
-    return new_session(model_name="isnet-general-use")
+    return new_session(model_name=model_name)
 
 
-def _default_remover(image_bytes: bytes) -> bytes:
+def _default_remover(image_bytes: bytes, model_name: str = DEFAULT_REMBG_MODEL) -> bytes:
     from rembg import remove
 
-    return remove(image_bytes, session=_get_rembg_session())
+    return remove(image_bytes, session=_get_rembg_session(model_name))
 
 
 def convert_image(
@@ -69,6 +73,7 @@ def convert_image(
     input_format: str | None = None,
     output_format: str | None = None,
     remove_background: bool = False,
+    rembg_model: str = DEFAULT_REMBG_MODEL,
     show_progress: bool = True,
     remover: Callable[[bytes], bytes] | None = None,
 ) -> None:
@@ -98,7 +103,7 @@ def convert_image(
             progress.update(1)
 
         if remove_background:
-            image_remover = remover or _default_remover
+            image_remover = remover or (lambda value: _default_remover(value, rembg_model))
             image_bytes = image_remover(image_bytes)
             if progress is not None:
                 progress.update(1)
@@ -107,9 +112,9 @@ def convert_image(
             save_kwargs = {}
             if resolved_output_format == "JPEG":
                 image = image.convert("RGB")
-                save_kwargs = {"quality": 95, "optimize": True, "progressive": True}
+                save_kwargs = {"quality": DEFAULT_JPEG_QUALITY, "optimize": True, "progressive": True}
             elif resolved_output_format == "PNG":
-                save_kwargs = {"optimize": True, "compress_level": 6}
+                save_kwargs = {"optimize": True, "compress_level": DEFAULT_PNG_COMPRESS_LEVEL}
 
             image.save(output_path, format=resolved_output_format, **save_kwargs)
 
@@ -133,6 +138,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--remove-background",
         action="store_true",
         help="Enable background removal mode using rembg.",
+    )
+    parser.add_argument(
+        "--rembg-model",
+        default=DEFAULT_REMBG_MODEL,
+        help="rembg model name for background removal (default: isnet-general-use).",
     )
     parser.add_argument(
         "--list-formats",
@@ -160,6 +170,7 @@ def main(argv: list[str] | None = None) -> int:
             input_format=args.input_format,
             output_format=args.output_format,
             remove_background=args.remove_background,
+            rembg_model=args.rembg_model,
         )
     except ModuleNotFoundError as exc:
         if args.remove_background and exc.name == "rembg":

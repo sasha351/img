@@ -16,7 +16,8 @@ Enable background removal mode:
 python img_cli.py \
   --input /path/to/input.png \
   --output /path/to/output.png \
-  --remove-background
+  --remove-background \
+  --rembg-model isnet-general-use
 ```
 
 Validate an expected input format:
