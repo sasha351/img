@@ -4,7 +4,7 @@ Image conversion tool
 ## CLI usage
 
 ```bash
-python /home/runner/work/img/img/img_cli.py \
+python img_cli.py \
   --input /path/to/input.png \
   --output /path/to/output.webp \
   --output-format WEBP
@@ -13,7 +13,7 @@ python /home/runner/work/img/img/img_cli.py \
 Enable background removal mode:
 
 ```bash
-python /home/runner/work/img/img/img_cli.py \
+python img_cli.py \
   --input /path/to/input.png \
   --output /path/to/output.png \
   --remove-background
@@ -22,7 +22,7 @@ python /home/runner/work/img/img/img_cli.py \
 Validate an expected input format:
 
 ```bash
-python /home/runner/work/img/img/img_cli.py \
+python img_cli.py \
   --input /path/to/input.png \
   --output /path/to/output.jpg \
   --input-format PNG
@@ -31,7 +31,7 @@ python /home/runner/work/img/img/img_cli.py \
 List all formats available in the current Pillow installation:
 
 ```bash
-python /home/runner/work/img/img/img_cli.py --list-formats
+python img_cli.py --list-formats
 ```
 
 A terminal progress bar is shown while processing.
@@ -39,5 +39,5 @@ A terminal progress bar is shown while processing.
 ## Dependencies
 
 ```bash
-pip install -r /home/runner/work/img/img/requirements.txt
+pip install -r requirements.txt
 ```
